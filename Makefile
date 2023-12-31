@@ -8,10 +8,10 @@ ADD_FLAGS        = -Wextra -O2
 TERMINAL_TIME    = 1
 
 #PATH AND EXTENSIONS
-C_FILES        = $(wildcard $(SRC)/**/*.c | $(SRC)/*.c)
+C_FILES        = $(wildcard $(SRC)/**/*$(EXTENSION) | $(SRC)/*$(EXTENSION))
 C_PATHS		   = $(wildcard $(SRC)/ | $(SRC)/**/)
 OBJ_PATH_FILES = $(patsubst $(SRC)%,$(OBJ)%,$(C_FILES))
-OBJ_FILES      = $(patsubst %.c,%.o,$(OBJ_PATH_FILES))
+OBJ_FILES      = $(patsubst %$(EXTENSION),%.o,$(OBJ_PATH_FILES))
 OBJ_FOLDERS    = $(patsubst $(SRC)%, $(OBJ)%, $(C_PATHS))
 
 #COLORS
@@ -31,9 +31,11 @@ CPP_OPTION=.cpp:
 ifeq ($(FILE_FORMAT), $(C_OPTION))
 COMPILER=gcc
 MAIN=main.c
+EXTENSION=.c
 else ifeq ($(FILE_FORMAT), $(CPP_OPTION))
 COMPILER=g++
 MAIN=main.cpp
+EXTENSION=.cpp
 else
 COMPILER=gcc
 endif
@@ -62,11 +64,11 @@ obj_create:
 
 #MOVING THE MAIN FILE FROM MAIN FOLDER TO SRC FOLDER
 copy_main: $(OBJ_FILES)
-	@cp $(MAIN) $(SRC)
+	@cp -f $(MAIN) $(SRC)
 	@sleep $(TERMINAL_TIME)
 	
 #COMPILING FILES TO .O EXTENSION
-$(OBJ)/%.o: $(SRC)/%.c
+$(OBJ)/%.o: $(SRC)/%$(EXTENSION)
 	@echo $(RED)GENERATING OBJECT FILES...
 	@$(COMPILER) -c $< -o $@ $(FLAGS)
 	@echo $(RED)OBJECT FILES GENERATION DONE!
@@ -89,8 +91,9 @@ $(EXECUTABLE): main.o
 
 #CLEANING WORKSPACE
 clean:
+	@sleep $(TERMINAL_TIME)
 	@echo $(RED)
 	@echo "CLEANING WORKSPACE..."
-	@ rm -rf $(OBJ) $(EXECUTABLE)
+	@rm -rf $(OBJ) $(EXECUTABLE)
 	@echo $(RESET_COLOR)
 	@sleep $(TERMINAL_TIME)
